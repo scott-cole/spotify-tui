@@ -8,14 +8,14 @@ local function get_project_root()
 end
 
 local function close()
-  if job_id and vim.fn.jobpid(job_id) > 0 then
-    vim.fn.chanclose(job_id)
+  if job_id and pcall(vim.fn.jobpid, job_id) then
+    pcall(vim.fn.chanclose, job_id)
   end
   if win_id and vim.api.nvim_win_is_valid(win_id) then
     vim.api.nvim_win_close(win_id, true)
   end
   if buf_id and vim.api.nvim_buf_is_valid(buf_id) then
-    vim.api.nvim_buf_delete(buf_id, { force = true })
+    pcall(vim.api.nvim_buf_delete, buf_id, { force = true })
   end
   win_id = nil
   buf_id = nil
