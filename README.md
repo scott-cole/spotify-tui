@@ -4,23 +4,6 @@ A Spotify TUI that floats inside Neovim like [Harpoon](https://github.com/ThePri
 
 ![screenshot](.github/screenshot.png)
 
-```
-╭─────────────────────────────────────────────────────────────╮
-│                     ♫ Spotify-Tui                            │
-│  ┌──────────────────┐                                       │
-│  │   █▄ ▄█▀▀█▄ ▄█▀  │  Track: Song Name                    │
-│  │   █▀▀ █▄▄█ ▀▀█    │                                       │
-│  │   ▀  ▀  ▀  ▀      │   Artist: Artist Name                │
-│  └──────────────────┘  │                                       │
-│                         │   Album: Album Name                  │
-│                         │                                       │
-│                         │  ▶ ████████████████░░░░  1:23 / 3:45 │
-│                         │                                       │
-│  ▁▂▃▄▅▆▇█████████████████████████████████████████▇▆▅▄▃▂▁    │
-│       [p] play    [n] next    [b] prev    [q] quit            │
-╰─────────────────────────────────────────────────────────────╯
-```
-
 ## Features
 
 - **Album Art** — Renders cover art in the terminal via [chafa](https://hpjansson.org/chafa/)
