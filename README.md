@@ -2,7 +2,7 @@
 
 A Spotify TUI that floats inside Neovim like [Harpoon](https://github.com/ThePrimeagen/harpoon). Press `<leader>sp` to open a centered window showing your current playback, album art, progress bar, animated equalizer, and controls.
 
-![screenshot](https://github.com/user-attachments/assets/spotify-tui-demo.png)
+![screenshot](.github/screenshot.png)
 
 ```
 ╭─────────────────────────────────────────────────────────────╮
