@@ -56,6 +56,11 @@ function M.toggle()
   })
 
   vim.api.nvim_set_option_value('buftype', 'terminal', { buf = buf_id })
+
+  vim.keymap.set('n', 'p', function() vim.api.nvim_chan_send(job_id, 'p') end, { buffer = buf_id, nowait = true })
+  vim.keymap.set('n', 'n', function() vim.api.nvim_chan_send(job_id, 'n') end, { buffer = buf_id, nowait = true })
+  vim.keymap.set('n', 'b', function() vim.api.nvim_chan_send(job_id, 'b') end, { buffer = buf_id, nowait = true })
+  vim.keymap.set('n', 'q', function() vim.api.nvim_chan_send(job_id, 'q') end, { buffer = buf_id, nowait = true })
 end
 
 M.setup = function(opts)
