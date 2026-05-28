@@ -1,16 +1,30 @@
 local M = {}
 local win_id = nil
 local buf_id = nil
+local job_id = nil
 
 local function get_project_root()
   return vim.fn.stdpath('data') .. '/lazy/spotify-tui'
 end
 
-function M.toggle()
+local function close()
+  if job_id and vim.fn.jobpid(job_id) > 0 then
+    vim.fn.chanclose(job_id)
+  end
   if win_id and vim.api.nvim_win_is_valid(win_id) then
     vim.api.nvim_win_close(win_id, true)
-    win_id = nil
-    buf_id = nil
+  end
+  if buf_id and vim.api.nvim_buf_is_valid(buf_id) then
+    vim.api.nvim_buf_delete(buf_id, { force = true })
+  end
+  win_id = nil
+  buf_id = nil
+  job_id = nil
+end
+
+function M.toggle()
+  if win_id and vim.api.nvim_win_is_valid(win_id) then
+    close()
     return
   end
 
@@ -32,16 +46,12 @@ function M.toggle()
     title_pos = 'center',
   })
 
-  vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { buffer = buf_id })
-
   local root = get_project_root()
   local cmd = 'node ' .. vim.fn.shellescape(root .. '/index.js')
 
-  vim.fn.termopen(cmd, {
+  job_id = vim.fn.termopen(cmd, {
     on_exit = function()
-      pcall(vim.api.nvim_win_close, win_id, true)
-      win_id = nil
-      buf_id = nil
+      close()
     end,
   })
 
@@ -59,6 +69,13 @@ M.setup = function(opts)
   end
 
   vim.api.nvim_create_user_command('SpotifyTui', M.toggle, {})
+
+  vim.api.nvim_create_autocmd('TermClose', {
+    group = vim.api.nvim_create_augroup('SpotifyTui', { clear = true }),
+    callback = function()
+      close()
+    end,
+  })
 end
 
 return M
