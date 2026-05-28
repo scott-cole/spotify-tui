@@ -1,84 +1,117 @@
-# Spotify-TUI
+# spotify-tui.nvim
 
-A terminal-based Spotify TUI with real-time playback display, equalizer visualization, and vim-style keyboard controls. Sits in a floating window like [Harpoon](https://github.com/ThePrimeagen/harpoon).
+A Spotify TUI that floats inside Neovim like [Harpoon](https://github.com/ThePrimeagen/harpoon). Press `<leader>sp` to open a centered window showing your current playback, album art, progress bar, animated equalizer, and controls.
+
+![screenshot](https://github.com/user-attachments/assets/spotify-tui-demo.png)
 
 ```
-╭───────────────────────────────────────────────────────────────╮
-│                     ♫ Spotify-Tui                             │
-│                                                               │
-│  Track: Song Name                                             │
-│                                                               │
-│   Artist: Artist Name                                         │
-│                                                               │
-│   Album: Album Name                                           │
-│                                                               │
-│  ▶ ████████████████████████████████░░░░  1:23 / 3:45          │
-│                                                               │
-│  ▁▂▃▄▅▆▇█████████████████████████████████████████▇▆▅▄▃▂▁     │
-│                                                               │
+╭─────────────────────────────────────────────────────────────╮
+│                     ♫ Spotify-Tui                            │
+│  ┌──────────────────┐                                       │
+│  │   █▄ ▄█▀▀█▄ ▄█▀  │  Track: Song Name                    │
+│  │   █▀▀ █▄▄█ ▀▀█    │                                       │
+│  │   ▀  ▀  ▀  ▀      │   Artist: Artist Name                │
+│  └──────────────────┘  │                                       │
+│                         │   Album: Album Name                  │
+│                         │                                       │
+│                         │  ▶ ████████████████░░░░  1:23 / 3:45 │
+│                         │                                       │
+│  ▁▂▃▄▅▆▇█████████████████████████████████████████▇▆▅▄▃▂▁    │
 │       [p] play    [n] next    [b] prev    [q] quit            │
-╰───────────────────────────────────────────────────────────────╯
+╰─────────────────────────────────────────────────────────────╯
 ```
 
 ## Features
 
-- **Now Playing** — Shows current track, artist, and album with labels
-- **Progress Bar** — Visual playback progress with time remaining
+- **Album Art** — Renders cover art in the terminal via [chafa](https://hpjansson.org/chafa/)
+- **Now Playing** — Track, artist, album with clear labels
+- **Progress Bar** — Visual playback progress with time
 - **Equalizer** — Animated frequency visualization
 - **Controls** — Play/pause, next, previous via keyboard
-- **Floating Window** — Centered overlay like Harpoon, doesn't take over your terminal
-- **Token Persistence** — Authenticates once, stores refresh token
+- **Floating Window** — Opens centered in Neovim like Harpoon, press `<leader>sp` to toggle
+- **Token Persistence** — Authenticates once via OAuth, stores refresh token
 
 ## Requirements
 
-- Node.js 18+
+- [Neovim](https://neovim.io/) 0.9+
+- [Node.js](https://nodejs.org/) 18+
+- [chafa](https://hpjansson.org/chafa/) — `brew install chafa`
 - A Spotify Premium account
-- A Spotify App registered at https://developer.spotify.com/dashboard
+- A Spotify App at https://developer.spotify.com/dashboard
 
-## Setup
+## Installation
 
-1. **Clone the repo:**
-   ```bash
-   git clone https://github.com/scott-cole/spotify-tui.git
-   cd spotify-tui
-   npm install
-   ```
+### lazy.nvim
 
-2. **Create a Spotify App:**
-   - Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
-   - Create a new app
-   - Add `http://127.0.0.1:8888/callback` as a Redirect URI
-   - Copy the Client ID and Client Secret
+```lua
+{
+  'scott-cole/spotify-tui',
+  build = 'npm install',
+  config = function()
+    require('spotify-tui').setup()
+    vim.keymap.set('n', '<leader>sp', '<cmd>SpotifyTui<CR>')
+  end,
+}
+```
 
-3. **Set credentials:**
-   Open `src/auth.js` and set `CLIENT_ID` and `CLIENT_SECRET` to your app's values.
+### Setup your Spotify credentials
 
-4. **Run:**
-   ```bash
-   node index.js
-   ```
-   On first run, it opens your browser to authorize with Spotify. After that, tokens are cached in `~/.config/spotify-tui/token.json`.
+Set these environment variables (add them to your shell rc file or Neovim config):
 
-## Controls
+```bash
+export SPOTIFY_CLIENT_ID="your_client_id"
+export SPOTIFY_CLIENT_SECRET="your_client_secret"
+```
 
-| Key | Action |
-|-----|--------|
-| `p` | Play / Pause toggle |
-| `n` | Next track |
-| `b` | Previous track |
-| `q` / `Ctrl+C` | Quit |
+Or set them in Neovim before lazy loads the plugin:
 
-## Project Structure
+```lua
+vim.env.SPOTIFY_CLIENT_ID = 'your_client_id'
+vim.env.SPOTIFY_CLIENT_SECRET = 'your_client_secret'
+```
+
+### Custom install path
+
+If you installed the plugin outside of lazy's default path:
+
+```lua
+require('spotify-tui').setup({ path = '/path/to/spotify-tui' })
+```
+
+## Getting Spotify Credentials
+
+1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+2. Create a new app
+3. Click **Settings** → **Edit Settings**
+4. Add `http://127.0.0.1:8888/callback` as a Redirect URI
+5. Save, then copy the **Client ID** and **Client Secret**
+
+## Usage
+
+| Action | Key |
+|--------|-----|
+| Toggle Spotify-Tui | `<leader>sp` |
+| Play / Pause | `p` |
+| Next track | `n` |
+| Previous track | `b` |
+| Quit | `q` or `Esc` then `:q` |
+| Exit terminal mode | `Esc` |
+
+On first run, the app opens your browser to authorize with Spotify. After that, tokens are cached in `~/.config/spotify-tui/token.json`.
+
+## How It Works
+
+The Neovim plugin opens a floating terminal window and runs the Node.js TUI inside it. The TUI uses [blessed](https://github.com/chjj/blessed) for layout and [spotify-web-api-node](https://github.com/thelinmichael/spotify-web-api-node) for the Spotify API.
 
 ```
 spotify-tui/
-├── index.js          # Entry point, wires auth → api → tui
+├── lua/spotify-tui/init.lua    # Neovim plugin (floating window + terminal)
+├── index.js                    # Entry point
 ├── src/
-│   ├── auth.js       # OAuth flow, token persistence, auto-refresh
-│   ├── api.js        # Spotify API wrapper (getState, play, pause, etc.)
-│   ├── tui.js        # Blessed TUI layout and rendering
-│   ├── cd-anim.js    # CD spinner animation
-│   └── keys.js       # Keybindings (vim-style)
+│   ├── auth.js                 # OAuth flow, token persistence, auto-refresh
+│   ├── api.js                  # Spotify API wrapper
+│   ├── tui.js                  # Blessed TUI layout and rendering
+│   └── cd-anim.js              # CD spinner animation
 └── package.json
 ```
 
