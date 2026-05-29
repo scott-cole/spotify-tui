@@ -1,7 +1,7 @@
 const SpotifyWebApi = require('spotify-web-api-node');
 const fs = require('fs');
 const path = require('path');
-const open = require('open');
+const open = require('open').default || require('open');
 
 const TOKEN_PATH = path.join(process.env.HOME || process.env.USERPROFILE, '.config/spotify-tui/token.json');
 
